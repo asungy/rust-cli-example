@@ -1,6 +1,14 @@
 mod cli;
 mod git;
 
-fn main() -> anyhow::Result<()> {
-    cli::exec()
+use std::process::ExitCode;
+
+fn main() -> ExitCode {
+    match cli::exec() {
+        Ok(_) => ExitCode::SUCCESS,
+        Err(e) => {
+            eprintln!("{}", e);
+            ExitCode::FAILURE
+        }
+    }
 }

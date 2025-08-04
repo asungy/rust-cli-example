@@ -1,8 +1,7 @@
 const NAME: &str = "branch";
 const ARG_GROUP_ID: &str = "branch-group-id";
 // Arguments
-const BRANCH_NAME_1: &str = "branch_name_1";
-const BRANCH_NAME_2: &str = "branch_name_2";
+const BRANCH_NAME: &str = "branch_name";
 const DELETE: &str = "delete";
 const MOVE: &str = "move";
 
@@ -17,8 +16,9 @@ pub fn command() -> Box<dyn super::ExecCommand> {
             clap::Command::new(NAME)
                 .about("List, create, delete branches")
                 .args(vec![
-                    clap::Arg::new(BRANCH_NAME_1)
+                    clap::Arg::new(BRANCH_NAME)
                         .required(true)
+                        .num_args(0..)
                         .help("Branch name"),
                     clap::Arg::new(DELETE)
                         .short('d')
@@ -40,15 +40,35 @@ pub fn command() -> Box<dyn super::ExecCommand> {
             Box::new(|matches: &clap::ArgMatches| -> anyhow::Result<()> {
                 let arg = matches
                     .get_one::<clap::Id>(ARG_GROUP_ID)
-                    .unwrap_or(&clap::Id::default())
+                    .expect("Expected required argument")
                     .as_str();
 
-                let branch_name1 = matches
-                    .get_one::<String>(BRANCH_NAME_1)
-                    .expect("Expected required argument");
+                let branch_name: Vec<String> = matches
+                    .get_many::<String>(BRANCH_NAME)
+                    .unwrap_or_default()
+                    .cloned()
+                    .collect();
 
                 match arg {
-                    "move" => 
+                    MOVE => {
+                        crate::git::branch(crate::git::BranchArg::Move {
+                            old_branch: branch_name
+                                .get(0)
+                                .ok_or(anyhow::anyhow!("Expected old branch name"))?
+                                .to_owned(),
+                            new_branch: branch_name
+                                .get(1)
+                                .ok_or(anyhow::anyhow!("Expected new branch name"))?
+                                .to_owned(),
+                        });
+                    }
+                    DELETE => crate::git::branch(crate::git::BranchArg::Delete {
+                        branch: branch_name
+                            .get(0)
+                            .ok_or(anyhow::anyhow!("Expected branch name"))?
+                            .to_owned(),
+                    }),
+                    _ => unreachable!("Unexpected branch argument."),
                 }
 
                 Ok(())

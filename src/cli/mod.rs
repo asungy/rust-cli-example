@@ -13,7 +13,7 @@ trait ExecCommand {
 }
 
 fn exec_commands() -> Vec<Box<dyn ExecCommand>> {
-    vec![]
+    vec![branch::command()]
 }
 
 fn subcommands() -> Vec<clap::Command> {

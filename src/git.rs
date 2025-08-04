@@ -14,7 +14,7 @@ pub fn branch(arg: BranchArg) {
         BranchArg::Move {
             old_branch,
             new_branch,
-        } => println!("Renaming branch from {old_branch} to {new_branch}."),
+        } => println!("Renaming branch from `{old_branch}` to `{new_branch}`."),
     }
 }
 
