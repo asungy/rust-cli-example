@@ -19,8 +19,8 @@ pub fn branch(arg: BranchArg) {
 }
 
 pub struct CloneArg {
-    bare: Option<bool>,
-    depth: Option<usize>,
+    pub bare: Option<bool>,
+    pub depth: Option<usize>,
 }
 
 pub fn clone(repo: String, arg: CloneArg) {
